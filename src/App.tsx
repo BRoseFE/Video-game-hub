@@ -1,17 +1,27 @@
-import ThisButton from "@/components/shared/ThisButton";
+import { Grid, GridItem } from "@chakra-ui/react";
 
 function App() {
 	return (
-		<>
-			<ThisButton
-				color="orange"
-				variant="surface"
-				text="Demo"
-				onClick={() => {
-					alert("Button clicked!");
-				}}
-			/>
-		</>
+		<Grid
+			templateAreas={{
+				base: `"nav" "main"`,
+				lg: `"nav    nav" "aside  main"`,
+			}}
+		>
+			<GridItem area="nav" bg="coral">
+				Nav
+			</GridItem>
+			<GridItem
+				area="aside"
+				bg="red"
+				display={{ base: "none", lg: "block" }}
+			>
+				Aside
+			</GridItem>
+			<GridItem area="main" bg="blue">
+				main
+			</GridItem>
+		</Grid>
 	);
 }
 
