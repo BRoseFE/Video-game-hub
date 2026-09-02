@@ -1,6 +1,18 @@
+import ThisButton from "@/components/shared/ThisButton";
+
 function App() {
-	// Note for me: <Provider></Provider> is used for chakra UI context wrapping (see docs)
-	return <></>;
+	return (
+		<>
+			<ThisButton
+				color="orange"
+				variant="surface"
+				text="Demo"
+				onClick={() => {
+					alert("Button clicked!");
+				}}
+			/>
+		</>
+	);
 }
 
 export default App;
