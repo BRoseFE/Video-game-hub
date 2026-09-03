@@ -1,5 +1,6 @@
 import { Flex, Box, Image } from "@chakra-ui/react";
 import logo from "@/assets/logo.webp";
+import { ColorModeButton } from "@/components/ui/color-mode";
 
 function NavBar() {
 	return (
@@ -8,7 +9,9 @@ function NavBar() {
 				<Image src={logo} />
 			</Box>
 			<Box height="10">SearchBar</Box>
-			<Box height="10">ThemeSwitch</Box>
+			<Box height="10">
+				<ColorModeButton />
+			</Box>
 		</Flex>
 	);
 }
