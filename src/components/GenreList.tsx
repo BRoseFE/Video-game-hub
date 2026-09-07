@@ -1,9 +1,9 @@
-import useGenres from "@/hooks/useGenres";
 import { Text } from "@chakra-ui/react";
 import GenreListSkeleton from "./GenreListSkeleton";
+import useGenres from "@/hooks/useGenres";
 
 function GenreList() {
-	const { genres, error, isLoading } = useGenres();
+	const { data, error, isLoading } = useGenres();
 	const skeletons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 	return (
@@ -14,7 +14,7 @@ function GenreList() {
 					skeletons.map((skeleton) => (
 						<GenreListSkeleton key={skeleton} />
 					))}
-				{genres.map((genre) => (
+				{data.map((genre) => (
 					<li key={genre.id}>{genre.name}</li>
 				))}
 			</ul>
