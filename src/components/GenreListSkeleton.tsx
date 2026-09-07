@@ -1,14 +1,20 @@
-import { HStack, Skeleton, SkeletonCircle, Stack } from "@chakra-ui/react";
+import {
+	HStack,
+	Skeleton,
+	SkeletonCircle,
+	SkeletonText,
+	Stack,
+} from "@chakra-ui/react";
 
 function GenreListSkeleton() {
 	return (
-		<HStack gap="5">
-			<SkeletonCircle size="12" />
-			<Stack flex="1">
-				<Skeleton height="5" />
-				<Skeleton height="5" width="80%" />
-			</Stack>
-		</HStack>
+		<Stack gap="6" maxW="xs">
+			<HStack width="full">
+				<SkeletonCircle size="10" />
+				<SkeletonText noOfLines={2} />
+			</HStack>
+			<Skeleton width="200px" />
+		</Stack>
 	);
 }
 
