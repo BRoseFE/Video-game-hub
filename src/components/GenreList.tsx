@@ -7,9 +7,10 @@ function GenreList() {
 	const { data, error, isLoading } = useGenres();
 	const skeletons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
+	if (error) return null;
+
 	return (
 		<>
-			{error && <Text color="red">{error}</Text>}
 			<List.Root unstyled={true}>
 				{isLoading &&
 					skeletons.map((skeleton) => (
