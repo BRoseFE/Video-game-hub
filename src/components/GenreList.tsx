@@ -5,9 +5,10 @@ import getCroppedImageUrl from "./services/image-url";
 
 interface Props {
 	onSelectGenre: (genre: Genre) => void;
+	selectedGenre: Genre | null;
 }
 
-function GenreList({ onSelectGenre }: Props) {
+function GenreList({ onSelectGenre, selectedGenre }: Props) {
 	const { data, error, isLoading } = useGenres();
 	const skeletons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -31,6 +32,11 @@ function GenreList({ onSelectGenre }: Props) {
 							<Button
 								variant="ghost"
 								fontSize="lg"
+								fontWeight={
+									genre.id === selectedGenre?.id
+										? "Bold"
+										: "normal"
+								}
 								onClick={() => onSelectGenre(genre)}
 							>
 								{genre.name}

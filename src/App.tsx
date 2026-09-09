@@ -28,6 +28,7 @@ function App() {
 				paddingLeft={5}
 			>
 				<GenreList
+					selectedGenre={selectedGenre}
 					onSelectGenre={(genre) => {
 						setSelectedGenre(genre);
 					}}
