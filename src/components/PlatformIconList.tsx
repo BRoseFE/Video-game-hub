@@ -5,11 +5,13 @@ import {
 	FaLinux,
 	FaApple,
 } from "react-icons/fa";
+
 import { BsNintendoSwitch, BsAndroid2, BsGlobe } from "react-icons/bs";
 import { MdPhoneIphone } from "react-icons/md";
-import type { Platform } from "@/hooks/useGames";
+
 import { HStack, Icon } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
+import type { Platform } from "@/hooks/usePlatforms";
 
 interface Props {
 	platforms: Platform[];
@@ -30,13 +32,19 @@ function PlatformIconList({ platforms }: Props) {
 
 	return (
 		<HStack marginY={1}>
-			{platforms.map((platform) => (
-				<Icon
-					key={platform.id}
-					as={iconMap[platform.slug]}
-					color="gray.500"
-				/>
-			))}
+			{platforms.map((platform) => {
+				const IconComponent = iconMap[platform.slug];
+
+				if (!IconComponent) return null;
+
+				return (
+					<Icon
+						key={platform.id}
+						as={IconComponent}
+						color="gray.500"
+					/>
+				);
+			})}
 		</HStack>
 	);
 }

@@ -1,6 +1,5 @@
 import type { GameQuery } from "@/App";
 import type { Platform } from "@/hooks/usePlatforms";
-import type { Ordering } from "./useOrdering";
 import useData from "./useData";
 
 export interface Game {
@@ -9,7 +8,6 @@ export interface Game {
 	background_image: string;
 	parent_platforms: { platform: Platform }[];
 	metacritic: number;
-	ordering: Ordering;
 }
 
 const useGames = (gameQuery: GameQuery) =>
@@ -19,7 +17,7 @@ const useGames = (gameQuery: GameQuery) =>
 			params: {
 				genres: gameQuery.genre?.id,
 				parent_platforms: gameQuery.platform?.id,
-				ordering: gameQuery.ordering?.name,
+				ordering: gameQuery.sortOrder,
 			},
 		},
 		[gameQuery],
