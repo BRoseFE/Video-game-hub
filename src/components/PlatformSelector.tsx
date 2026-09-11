@@ -15,10 +15,10 @@ function PlatformSelector({ onSelectPlatform, selectedPlatform }: Props) {
 	if (error) return null;
 
 	return (
-		<Stack gap="4" align="flex-start" paddingLeft={10}>
+		<Stack>
 			<Menu.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
 				<Menu.Trigger asChild>
-					<Button variant="outline" size="lg">
+					<Button variant="subtle" size="lg">
 						{selectedPlatform?.name || "Platforms"}
 						<FaAngleDown />
 					</Button>
