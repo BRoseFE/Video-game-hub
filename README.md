@@ -119,10 +119,6 @@ api
 ├── games.ts              # Vercel function for RAWG game requests
 └── platforms.ts          # Vercel function for RAWG platform requests
 
-public
-├── favicon.svg
-└── icons.svg
-
 src
 ├── assets/
 │   ├── emojis/           # Rating indicator images
@@ -165,7 +161,6 @@ src
 │   └── usePlatforms.ts   # Platform API hook
 │
 ├── App.tsx
-├── App.css
 ├── index.css
 └── main.tsx
 ```
