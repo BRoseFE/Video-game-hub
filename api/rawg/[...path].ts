@@ -1,27 +1,34 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-	// Vercel's catch-all parameter can be available as either
-	// `path` or as part of the request URL depending on the runtime.
 	let path = req.query.path;
 
+	// Handle Vercel's catch-all route parameter
 	if (Array.isArray(path)) {
 		path = path.join("/");
 	}
 
+	// Fallback: extract the path directly from the request URL
 	if (!path && req.url) {
 		const pathname = req.url.split("?")[0];
+		const prefix = "/api/rawg/";
 
-		const match = pathname.match(/^\/api\/rawg\/(.+)$/);
-
-		if (match) {
-			path = match[1];
+		if (pathname.startsWith(prefix)) {
+			path = pathname.slice(prefix.length);
 		}
 	}
 
-	if (!path) {
+	if (!path || typeof path !== "string") {
 		return res.status(400).json({
 			error: "Missing RAWG API path",
+		});
+	}
+
+	const apiKey = process.env.RAWG_API_KEY;
+
+	if (!apiKey) {
+		return res.status(500).json({
+			error: "RAWG_API_KEY environment variable is not configured",
 		});
 	}
 
@@ -39,21 +46,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		}
 	}
 
-	const apiKey = process.env.RAWG_API_KEY;
-
-	if (!apiKey) {
-		return res.status(500).json({
-			error: "RAWG_API_KEY environment variable is not configured",
-		});
-	}
-
 	params.set("key", apiKey);
 
-	try {
-		const response = await fetch(
-			`https://api.rawg.io/api/${path}?${params.toString()}`,
-		);
+	const rawgUrl = `https://api.rawg.io/api/${path}?${params.toString()}`;
 
+	try {
+		const response = await fetch(rawgUrl);
 		const data = await response.json();
 
 		return res.status(response.status).json(data);
