@@ -1,2 +1,5 @@
 import axios from "axios";
-export default axios.create({ baseURL: "/api/rawg" });
+
+export default axios.create({
+	baseURL: "/api",
+});
