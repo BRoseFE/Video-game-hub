@@ -37,7 +37,7 @@ const useData = <T>(
 				});
 
 			return () => {
-				controller.abort;
+				controller.abort();
 			};
 		},
 		deps ? [...deps] : [],
