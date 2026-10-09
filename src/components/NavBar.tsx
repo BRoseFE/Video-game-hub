@@ -1,7 +1,7 @@
-import { Box, Flex, Image } from "@chakra-ui/react";
 import logo from "@/assets/logo.webp";
-import { ColorModeButton } from "@/components/ui/color-mode";
 import SearchInput from "@/components/SearchInput";
+import { ColorModeButton } from "@/components/ui/color-mode";
+import { Box, Flex, Image } from "@chakra-ui/react";
 
 interface Props {
 	onSearch: (searchText: string) => void;

@@ -1,7 +1,7 @@
+import usePlatforms, { type Platform } from "@/hooks/usePlatforms";
 import { Button, Menu, Portal, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
-import usePlatforms, { type Platform } from "@/hooks/usePlatforms";
 
 interface Props {
 	onSelectPlatform: (platform: Platform) => void;

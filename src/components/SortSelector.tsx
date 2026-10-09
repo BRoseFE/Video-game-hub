@@ -1,4 +1,4 @@
-import { Stack, Menu, Button, Portal } from "@chakra-ui/react";
+import { Button, Menu, Portal, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 
