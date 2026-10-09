@@ -8,7 +8,9 @@ export interface FetchResponse<T> {
 export default axios.create({
 	baseURL: "https://api.rawg.io/api",
 	params: {
-		key: "6ba99aa5f482414595fd7777f2610094",
+		key: "6ba99aa5f482414595fd7777f2610094", // This is a temp key for build testing
+		// Will be refreshed with a new key and vercel environment variable created to hide api
+		// from github repo and public view
 	},
 });
 
