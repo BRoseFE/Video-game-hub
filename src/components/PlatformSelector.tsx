@@ -5,12 +5,16 @@ import { FaAngleDown } from "react-icons/fa";
 
 interface Props {
 	onSelectPlatform: (platform: Platform) => void;
-	selectedPlatform: Platform | null;
+	selectedPlatformId?: number;
 }
 
-function PlatformSelector({ onSelectPlatform, selectedPlatform }: Props) {
+function PlatformSelector({ onSelectPlatform, selectedPlatformId }: Props) {
 	const [open, setOpen] = useState(false);
 	const { data, error } = usePlatforms();
+
+	const selectedPlatform = data.results.find(
+		(p) => p.id === selectedPlatformId,
+	);
 
 	if (error) return null;
 
