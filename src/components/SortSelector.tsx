@@ -1,13 +1,9 @@
+import useGameQueryStore from "@/store";
 import { Button, Menu, Portal, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 
-interface Props {
-	onSelectSortOrder: (sortOrder: string) => void;
-	sortOrder: string;
-}
-
-function SortSelector({ onSelectSortOrder, sortOrder }: Props) {
+function SortSelector() {
 	const [open, setOpen] = useState(false);
 	const sortOrders = [
 		{ value: "", label: "Relevance" },
@@ -17,6 +13,9 @@ function SortSelector({ onSelectSortOrder, sortOrder }: Props) {
 		{ value: "-metacritic", label: "Popularity" },
 		{ value: "-rating", label: "Average rating" },
 	];
+
+	const sortOrder = useGameQueryStore((s) => s.gameQuery.sortOrder);
+	const selectedSortOrder = useGameQueryStore((s) => s.setSortOrder);
 
 	const currentSortOrder = sortOrders.find(
 		(order) => order.value === sortOrder,
@@ -39,7 +38,7 @@ function SortSelector({ onSelectSortOrder, sortOrder }: Props) {
 									key={order.value}
 									value={order.value}
 									onClick={() =>
-										onSelectSortOrder(order.value)
+										selectedSortOrder(order.value)
 									}
 								>
 									{order.label}

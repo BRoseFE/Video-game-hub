@@ -1,18 +1,17 @@
 import usePlatform from "@/hooks/usePlatform";
-import usePlatforms, { type Platform } from "@/hooks/usePlatforms";
+import usePlatforms from "@/hooks/usePlatforms";
+import useGameQueryStore from "@/store";
 import { Button, Menu, Portal, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 
-interface Props {
-	onSelectPlatform: (platform: Platform) => void;
-	selectedPlatformId?: number;
-}
-
-function PlatformSelector({ onSelectPlatform, selectedPlatformId }: Props) {
+function PlatformSelector() {
 	const [open, setOpen] = useState(false);
 	const { data, error } = usePlatforms();
 
+	const setSelectedPlatform = useGameQueryStore((s) => s.setPlatformId);
+
+	const selectedPlatformId = useGameQueryStore((s) => s.gameQuery.platformId);
 	const selectedPlatform = usePlatform(selectedPlatformId);
 
 	if (error) return null;
@@ -33,7 +32,9 @@ function PlatformSelector({ onSelectPlatform, selectedPlatformId }: Props) {
 								<Menu.Item
 									key={platform.id}
 									value={platform.name}
-									onClick={() => onSelectPlatform(platform)}
+									onClick={() =>
+										setSelectedPlatform(platform.id)
+									}
 								>
 									{platform.name}
 								</Menu.Item>

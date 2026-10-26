@@ -3,15 +3,11 @@ import SearchInput from "@/components/SearchInput";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { Box, Flex, Image } from "@chakra-ui/react";
 
-interface Props {
-	onSearch: (searchText: string) => void;
-}
-
-function NavBar({ onSearch }: Props) {
+function NavBar() {
 	return (
 		<Flex p={2}>
 			<Image src={logo} boxSize="60px" />
-			<SearchInput onSearch={onSearch} />
+			<SearchInput />
 			<Box paddingTop={2}>
 				<ColorModeButton borderRadius={15} size="lg" />
 			</Box>
