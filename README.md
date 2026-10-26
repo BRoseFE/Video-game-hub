@@ -70,10 +70,34 @@ This prevents the API key from being included in the client-side React bundle or
   API requests are centralized through a generic `useData<T>` hook. This manages loading state, errors, response data, and request cancellation while allowing different API resources to remain type-safe.
 
 - **Specialized API hooks**
-  Hooks such as `useGames` and `usePlatforms` build on top of `useData<T>`, keeping API logic separate from presentation components.
+  Hooks such as `useGames` and `usePlatforms` build on top of the data-fetching layer, keeping API logic separate from presentation components.
 
-- **Centralized game query state**
-  Search text, selected genre, selected platform, and sorting preferences are managed through a shared `GameQuery` interface. Changes to the query automatically trigger a new game request.
+- **Infinite scrolling with React Query**
+  React Query's `useInfiniteQuery` manages paginated game requests, allowing additional games to load as the user scrolls instead of fetching the entire catalogue upfront. The hook tracks available pages and exposes pagination state and methods for retrieving subsequent results.
+
+- **Automatic pagination**
+  Pagination is driven by the API's response metadata. The `getNextPageParam` configuration determines the next page to request and identifies when no additional results are available. An `IntersectionObserver` triggers `fetchNextPage` when the user reaches the bottom of the game grid, providing a seamless browsing experience without traditional pagination controls.
+
+- **Server-state caching**
+  React Query caches API responses and manages their freshness and lifecycle. Cached results can be reused when revisiting previously requested data, reducing unnecessary network requests. Cache behaviour is controlled through query options such as `staleTime` and `gcTime`.
+
+- **Global client state with Zustand**
+  Zustand manages shared game query preferences through a centralized `GameQuery` interface. This includes search text, selected genre, selected platform, and sorting preferences. Components can access and update these values through a shared store without requiring prop drilling or additional context providers.
+
+- **Separation of server state and client state**
+  React Query manages server state, including fetched game data, pagination, loading states, and request errors. Zustand manages client-side UI preferences and filter selections. Keeping these responsibilities separate avoids duplicating API response data in the global store.
+
+- **Query-based cache management**
+  React Query query keys incorporate the active search text, genre, platform, and sorting preferences. When Zustand updates these values, the query key changes and React Query retrieves the corresponding results. Each filter combination maintains its own cache, preventing results from different searches or filters from being mixed together.
+
+- **Pagination reset on filter changes**
+  Changing the search text, genre, platform, or sorting preference initiates a new query. Infinite scrolling starts from the first page of the updated result set, ensuring that previously loaded pages from another filter combination are not displayed alongside the new results.
+
+- **Request deduplication and pagination safeguards**
+  React Query tracks in-flight requests and helps prevent redundant requests for the same query. Pagination triggers check whether another page is available and whether a page request is already in progress, reducing duplicate fetches during rapid scrolling.
+
+- **Pagination-aware loading and error states**
+  Initial loading and subsequent page loading are handled separately. Skeleton components provide feedback while the first batch of games loads, while additional pages can display a smaller loading indicator without removing existing game cards. Errors can be handled independently for initial requests and subsequent page requests.
 
 - **Serverless API layer**
   Vercel serverless functions act as a lightweight backend between the React application and RAWG. This keeps the API credential server-side while allowing the frontend to remain a static React application.
@@ -88,10 +112,10 @@ This prevents the API key from being included in the client-side React bundle or
   RAWG image URLs are transformed through a shared utility to request appropriately cropped images. A local placeholder is used when an image is unavailable.
 
 - **Request cancellation**
-  `AbortController` is used by the data-fetching hook to cancel requests when the associated component effect is cleaned up.
+  `AbortController` supports cancellation of in-flight requests when the associated operation is no longer needed. Request cancellation is coordinated with the data-fetching approach to avoid unnecessary network activity and stale results.
 
 - **TypeScript data models**
-  API responses and component data are represented using TypeScript interfaces and generic types, providing type safety as data moves through the application.
+  API responses, game query parameters, and component data are represented using TypeScript interfaces and generic types, providing type safety as data moves through the application.
 
 ---
 
@@ -100,6 +124,8 @@ This prevents the API key from being included in the client-side React bundle or
 - **React 19**
 - **TypeScript**
 - **Vite**
+- **TanStack React Query** — Server-state management, caching, pagination, and infinite scrolling
+- **Zustand** — Global client-side state management
 - **Chakra UI**
 - **Axios**
 - **React Icons**
@@ -108,7 +134,7 @@ This prevents the API key from being included in the client-side React bundle or
 - **RAWG Video Games Database API**
 - **ESLint**
 
-Chakra UI is used for the application's responsive component system and layout primitives, while the application logic and API integration are implemented using React, TypeScript, and custom hooks.
+Chakra UI is used for the application's responsive component system and layout primitives. React Query manages server state, caching, and paginated data fetching, while Zustand maintains shared client-side query preferences. API communication is implemented using Axios and dedicated hooks, with Vercel serverless functions handling requests to RAWG. The project leverages TypeScript throughout to ensure type safety and maintainability across components, hooks, and API interactions.
 
 ---
 
