@@ -204,9 +204,7 @@ Potential future enhancements could include:
 
 - Dedicated game detail pages
 - Game screenshots and trailers
-- Pagination or infinite scrolling
 - Favourite games or a personal game library
-- Additional filtering options
 - Improved accessibility
 - Automated unit and integration testing
 - Persistent user preferences
