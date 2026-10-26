@@ -188,7 +188,8 @@ src
 │
 ├── App.tsx
 ├── index.css
-└── main.tsx
+├── main.tsx
+└── store.ts
 ```
 
 Components are separated by responsibility, while API communication and data-fetching logic are kept within dedicated services and hooks. The `/api` directory contains the serverless functions responsible for communicating with RAWG.
