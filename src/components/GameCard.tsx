@@ -1,4 +1,4 @@
-import type { Game } from "@/hooks/useGames";
+import type { Game } from "@/entities/Game";
 import { Card, CardBody, HStack, Image } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import Emoji from "@/components/Emoji";
