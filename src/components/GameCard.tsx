@@ -1,6 +1,7 @@
 import type { Game } from "@/hooks/useGames";
 import { Card, CardBody, HStack, Image } from "@chakra-ui/react";
-import Emoji from "./Emoji";
+import { Link } from "react-router-dom";
+import Emoji from "@/components/Emoji";
 import MetaCritic from "./MetaCritic";
 import PlatformIconList from "./PlatformIconList";
 import getCroppedImageUrl from "./services/image-url";
@@ -21,7 +22,7 @@ function GameCard({ game }: GameCardProps) {
 					<MetaCritic criticScore={game.metacritic} />
 				</HStack>
 				<Card.Title fontSize="2xl">
-					{game.name}
+					<Link to={"/games/" + game.slug}>{game.name}</Link>
 					<Emoji rating={game.rating_top} />
 				</Card.Title>
 			</CardBody>
