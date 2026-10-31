@@ -1,10 +1,10 @@
-import type { Platform } from "@/entities/Platform";
-import type { Genre } from "@/entities/Genre";
-import type { Publisher } from "./Publisher";
-import type { Trailer } from "./Trailer";
-import type { Screenshot } from "./Screenshot";
+import type Platform from "@/entities/Platform";
+import type Genre from "@/entities/Genre";
+import type Publisher from "@/entities/Publisher";
+import type Trailer from "@/entities/Trailer";
+import type Screenshot from "@/entities/Screenshot";
 
-export interface Game {
+export default interface Game {
 	id: number;
 	slug: string;
 	description_raw: string;

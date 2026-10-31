@@ -1,5 +1,5 @@
 import DefinitionItem from "@/components/DefinitionItem";
-import type { Game } from "@/entities/Game";
+import type Game from "@/entities/Game";
 import { SimpleGrid, Text } from "@chakra-ui/react";
 import MetaCritic from "./MetaCritic";
 
