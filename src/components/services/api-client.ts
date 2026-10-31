@@ -7,12 +7,7 @@ export interface FetchResponse<T> {
 }
 
 const axiosInstance = axios.create({
-	baseURL: "https://api.rawg.io/api",
-	params: {
-		key: "6ba99aa5f482414595fd7777f2610094", // This is a free temp key for build testing
-		// Will be refreshed with a new key and vercel environment variable created to hide api
-		// from github repo and public view.
-	},
+	baseURL: "/api/rawg",
 });
 
 class APIClient<T> {
@@ -22,7 +17,7 @@ class APIClient<T> {
 		this.endpoint = endpoint;
 	}
 
-	getAll = (config: AxiosRequestConfig) => {
+	getAll = (config?: AxiosRequestConfig) => {
 		return axiosInstance
 			.get<FetchResponse<T>>(this.endpoint, config)
 			.then((res) => res.data);
@@ -30,23 +25,9 @@ class APIClient<T> {
 
 	get = (id: string) => {
 		return axiosInstance
-			.get<T>(this.endpoint + "/" + id)
+			.get<T>(`${this.endpoint}/${encodeURIComponent(id)}`)
 			.then((res) => res.data);
 	};
 }
 
 export default APIClient;
-
-// This is the code needed for production, replace all above code with this
-// My api key stored on vercel will not be accessible
-// I will need to refactor this code to work with my class above
-// Basically I keep the class as is and refactor the axiosInstance code with the below code
-//
-//
-//code starts here:
-//
-// import axios from "axios";
-
-// export default axios.create({
-// 	baseURL: "/api",
-// });
