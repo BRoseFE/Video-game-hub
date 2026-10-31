@@ -12,6 +12,7 @@ function PlatformSelector() {
 	const setSelectedPlatform = useGameQueryStore((s) => s.setPlatformId);
 
 	const selectedPlatformId = useGameQueryStore((s) => s.gameQuery.platformId);
+
 	const selectedPlatform = usePlatform(selectedPlatformId);
 
 	if (error) return null;
@@ -21,13 +22,21 @@ function PlatformSelector() {
 			<Menu.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
 				<Menu.Trigger asChild>
 					<Button variant="subtle" size="lg">
-						{selectedPlatform?.name || "Platforms"}
+						{selectedPlatform?.name || "All Platforms"}
 						<FaAngleDown />
 					</Button>
 				</Menu.Trigger>
+
 				<Portal>
 					<Menu.Positioner>
 						<Menu.Content>
+							<Menu.Item
+								value="all-platforms"
+								onClick={() => setSelectedPlatform(undefined)}
+							>
+								All Platforms
+							</Menu.Item>
+
 							{data?.results.map((platform) => (
 								<Menu.Item
 									key={platform.id}

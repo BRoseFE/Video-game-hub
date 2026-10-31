@@ -1,10 +1,11 @@
 import useGameQueryStore from "@/store";
-import { Button, Menu, Portal, Stack } from "@chakra-ui/react";
+import { Button, HStack, Menu, Portal } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 
 function SortSelector() {
 	const [open, setOpen] = useState(false);
+
 	const sortOrders = [
 		{ value: "", label: "Relevance" },
 		{ value: "-added", label: "Date added" },
@@ -22,7 +23,7 @@ function SortSelector() {
 	);
 
 	return (
-		<Stack>
+		<HStack>
 			<Menu.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
 				<Menu.Trigger asChild>
 					<Button variant="subtle" size="lg">
@@ -30,6 +31,7 @@ function SortSelector() {
 						<FaAngleDown />
 					</Button>
 				</Menu.Trigger>
+
 				<Portal>
 					<Menu.Positioner>
 						<Menu.Content>
@@ -48,7 +50,16 @@ function SortSelector() {
 					</Menu.Positioner>
 				</Portal>
 			</Menu.Root>
-		</Stack>
+
+			<Button
+				variant="ghost"
+				size="lg"
+				onClick={() => selectedSortOrder("")}
+				disabled={!sortOrder}
+			>
+				Clear All
+			</Button>
+		</HStack>
 	);
 }
 

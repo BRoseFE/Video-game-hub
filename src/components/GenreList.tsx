@@ -1,4 +1,4 @@
-import { Button, Heading, HStack, Image, List } from "@chakra-ui/react";
+import { Button, Heading, HStack, Image, List, Stack } from "@chakra-ui/react";
 import GenreListSkeleton from "./GenreListSkeleton";
 import useGenres from "@/hooks/useGenres";
 import getCroppedImageUrl from "./services/image-url";
@@ -7,6 +7,7 @@ import useGameQueryStore from "@/store";
 function GenreList() {
 	const { data, error, isLoading } = useGenres();
 	const skeletons = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
 	const selectedGenreId = useGameQueryStore((s) => s.gameQuery.genreId);
 	const setSelectedGenreId = useGameQueryStore((s) => s.setGenreId);
 
@@ -17,11 +18,25 @@ function GenreList() {
 			<Heading fontSize="2xl" marginBottom={3}>
 				Genres
 			</Heading>
+
+			<Stack gap={2} marginBottom={3}>
+				<Button
+					variant={selectedGenreId === undefined ? "solid" : "ghost"}
+					colorPalette="yellow"
+					justifyContent="flex-start"
+					onClick={() => setSelectedGenreId(undefined)}
+					disabled={selectedGenreId === undefined}
+				>
+					All Genres
+				</Button>
+			</Stack>
+
 			<List.Root unstyled={true}>
 				{isLoading &&
 					skeletons.map((skeleton) => (
 						<GenreListSkeleton key={skeleton} />
 					))}
+
 				{data?.results.map((genre) => (
 					<List.Item key={genre.id} paddingY="5px">
 						<HStack>
@@ -31,6 +46,7 @@ function GenreList() {
 								objectFit="cover"
 								src={getCroppedImageUrl(genre.image_background)}
 							/>
+
 							<Button
 								whiteSpace="normal"
 								textAlign="left"
@@ -38,7 +54,7 @@ function GenreList() {
 								fontSize="lg"
 								fontWeight={
 									genre.id === selectedGenreId
-										? "Bold"
+										? "bold"
 										: "normal"
 								}
 								onClick={() => setSelectedGenreId(genre.id)}
