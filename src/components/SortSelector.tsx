@@ -50,15 +50,6 @@ function SortSelector() {
 					</Menu.Positioner>
 				</Portal>
 			</Menu.Root>
-
-			<Button
-				variant="ghost"
-				size="lg"
-				onClick={() => selectedSortOrder("")}
-				disabled={!sortOrder}
-			>
-				Clear All
-			</Button>
 		</HStack>
 	);
 }
