@@ -1,7 +1,8 @@
-# Video Game Discovery - React
+# Video Game Discovery – React
 
-A responsive React application for discovering and browsing video games using the RAWG Video Games Database API.
-This project focuses on reusable component architecture, typed API data, custom React hooks, responsive UI design, and secure API integration using Vercel serverless functions.
+A responsive React application for discovering, searching, and exploring video games using the RAWG Video Games Database API.
+
+This project focuses on reusable component architecture, strongly typed API integration, server-state management, infinite scrolling, responsive UI design, and secure API communication through Vercel serverless functions.
 
 ---
 
@@ -13,234 +14,384 @@ This project focuses on reusable component architecture, typed API data, custom 
 
 ## ✨ Features
 
-- Search for games using the RAWG API
+- Search for video games using the RAWG API
 - Filter games by genre
 - Filter games by gaming platform
 - Sort games by relevance, date added, name, release date, popularity, and average rating
+- Infinite scrolling to progressively load additional games
+- Dedicated game detail pages
+- Expandable game descriptions
 - Display Metacritic scores
-- Display supported platform icons
+- Display supported gaming platform icons
 - Visual rating indicators based on game ratings
+- Game metadata including platforms, genres, and publishers
+- Game screenshots and trailers
 - Responsive game grid across desktop, tablet, and mobile layouts
 - Light and dark colour modes
-- Loading skeletons while API requests are processed
+- Loading skeletons while game data is being retrieved
+- Loading indicators for subsequent pagination requests
 - API error handling
 - Responsive navigation and search interface
 - Cropped API images with local placeholder fallback
+- Cached API responses using TanStack React Query
 - Protected RAWG API key using Vercel environment variables and serverless functions
 
 ---
 
 ## 🔌 API & Data Flow
 
-The application retrieves game and platform data from the **RAWG Video Games Database API** through a small Vercel serverless API layer.
+The application retrieves game information from the **RAWG Video Games Database API** through a consolidated Vercel serverless function.
 
-| Endpoint         | Description                                                                 |
-| ---------------- | --------------------------------------------------------------------------- |
-| `/api/games`     | Retrieves games and applies search, genre, platform, and sorting parameters |
-| `/api/platforms` | Retrieves the parent platform list used by the platform selector            |
+Rather than exposing the RAWG API key in the frontend, all API requests are routed through the application's own backend endpoint.
 
-The frontend communicates only with the application's `/api` endpoints.
+### API Endpoints
+
+| Application Endpoint                | Description                                                                      |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| `/api/rawg/games`                   | Retrieves games with search, genre, platform, sorting, and pagination parameters |
+| `/api/rawg/games/:slug`             | Retrieves individual game details                                                |
+| `/api/rawg/games/:id/screenshots`   | Retrieves screenshots for a specific game                                        |
+| `/api/rawg/games/:id/movies`        | Retrieves available game trailers                                                |
+| `/api/rawg/genres`                  | Retrieves available game genres                                                  |
+| `/api/rawg/platforms/lists/parents` | Retrieves parent gaming platforms                                                |
+
+All requests are routed through a single Vercel serverless function, `api/rawg.ts`, using URL rewrites configured in `vercel.json`.
+
+### Request Flow
 
 ```text
 React Application
-        │
-        ▼
-     Axios
-        │
-        ├── /api/games
-        │
-        └── /api/platforms
-                │
-                ▼
-       Vercel Serverless Functions
-                │
-                ▼
+       │
+       ▼
+TanStack React Query
+       │
+       ▼
+   Axios API Client
+       │
+       ▼
+ /api/rawg/*
+       │
+       ▼
+  Vercel Rewrites
+       │
+       ▼
+  api/rawg.ts
+       │
+       ├── Endpoint validation
+       ├── Query parameter validation
+       ├── Environment variable lookup
+       └── RAWG API request
+               │
+               ▼
             RAWG API
+               │
+               ▼
+       JSON Response
+               │
+               ▼
+       React Application
 ```
 
-The RAWG API key is stored as a Vercel environment variable and accessed server-side using `process.env.RAWG_API_KEY`.
+The RAWG API key is stored as a Vercel environment variable and accessed server-side through:
 
-This prevents the API key from being included in the client-side React bundle or committed to the repository.
+```typescript
+process.env.RAWG_API_KEY;
+```
+
+The API key is never included in the client-side React bundle or exposed through frontend API requests.
+
+The serverless function also restricts access to approved RAWG endpoints and query parameters rather than acting as an unrestricted API proxy.
 
 ---
 
 ## 🧠 Design & Engineering Decisions
 
-- **Custom data-fetching hook**
-  API requests are centralized through a generic `useData<T>` hook. This manages loading state, errors, response data, and request cancellation while allowing different API resources to remain type-safe.
+- **Generic Axios API client**
 
-- **Specialized API hooks**
-  Hooks such as `useGames` and `usePlatforms` build on top of the data-fetching layer, keeping API logic separate from presentation components.
+    A reusable generic `APIClient<T>` class centralizes API communication. It provides methods for retrieving collections and individual resources while maintaining typed responses through TypeScript generics.
 
-- **Infinite scrolling with React Query**
-  React Query's `useInfiniteQuery` manages paginated game requests, allowing additional games to load as the user scrolls instead of fetching the entire catalogue upfront. The hook tracks available pages and exposes pagination state and methods for retrieving subsequent results.
+- **Centralized API communication**
+
+    API requests are handled through a shared Axios instance. The frontend communicates with the application's `/api/rawg` endpoint rather than communicating directly with RAWG.
+
+- **Dynamic Vercel serverless routing**
+
+    A single serverless function handles multiple RAWG resources, including games, genres, platforms, screenshots, and movies. URL rewrites direct incoming requests to the appropriate RAWG endpoint.
+
+- **Server-side API key protection**
+
+    The RAWG API key is stored in Vercel environment variables and accessed exclusively within the serverless function. This prevents credentials from being embedded in frontend source code or production JavaScript bundles.
+
+- **Endpoint and query parameter validation**
+
+    The serverless function uses an endpoint allowlist and an approved query parameter list. This restricts which RAWG resources can be accessed through the backend and prevents clients from overriding the private API key.
+
+- **Infinite scrolling with TanStack React Query**
+
+    `useInfiniteQuery` manages paginated game requests. The application initially retrieves the first page of results and progressively loads additional games as the user scrolls.
 
 - **Automatic pagination**
-  Pagination is driven by the API's response metadata. The `getNextPageParam` configuration determines the next page to request and identifies when no additional results are available. An `IntersectionObserver` triggers `fetchNextPage` when the user reaches the bottom of the game grid, providing a seamless browsing experience without traditional pagination controls.
+
+    Pagination is driven by the RAWG API response metadata. The `getNextPageParam` configuration determines whether additional results are available and calculates the next page to retrieve.
+
+    The `react-infinite-scroll-component` library monitors scrolling and triggers `fetchNextPage` when the user approaches the bottom of the game grid.
 
 - **Server-state caching**
-  React Query caches API responses and manages their freshness and lifecycle. Cached results can be reused when revisiting previously requested data, reducing unnecessary network requests. Cache behaviour is controlled through query options such as `staleTime` and `gcTime`.
+
+    TanStack React Query manages API response caching, loading states, request errors, and data freshness.
+
+    Game, genre, and platform queries use a 24-hour `staleTime`, reducing unnecessary network requests when revisiting previously retrieved data.
 
 - **Global client state with Zustand**
-  Zustand manages shared game query preferences through a centralized `GameQuery` interface. This includes search text, selected genre, selected platform, and sorting preferences. Components can access and update these values through a shared store without requiring prop drilling or additional context providers.
+
+    Zustand manages shared game query preferences through a centralized `GameQuery` interface. This includes search text, selected genre, selected platform, and sorting preferences.
+
+    Components access and update these values through a shared store without requiring prop drilling or additional context providers.
 
 - **Separation of server state and client state**
-  React Query manages server state, including fetched game data, pagination, loading states, and request errors. Zustand manages client-side UI preferences and filter selections. Keeping these responsibilities separate avoids duplicating API response data in the global store.
+
+    TanStack React Query manages server state, including retrieved game data, pagination, loading states, and API errors.
+
+    Zustand manages client-side query preferences and filter selections.
+
+    Keeping these responsibilities separate prevents API response data from being unnecessarily duplicated in the global client-side store.
 
 - **Query-based cache management**
-  React Query query keys incorporate the active search text, genre, platform, and sorting preferences. When Zustand updates these values, the query key changes and React Query retrieves the corresponding results. Each filter combination maintains its own cache, preventing results from different searches or filters from being mixed together.
+
+    React Query query keys incorporate the active game query state, including search text, selected genre, selected platform, and sorting preferences.
+
+    When Zustand updates these values, the query key changes and React Query retrieves the corresponding results. Each filter combination maintains its own cache.
 
 - **Pagination reset on filter changes**
-  Changing the search text, genre, platform, or sorting preference initiates a new query. Infinite scrolling starts from the first page of the updated result set, ensuring that previously loaded pages from another filter combination are not displayed alongside the new results.
 
-- **Request deduplication and pagination safeguards**
-  React Query tracks in-flight requests and helps prevent redundant requests for the same query. Pagination triggers check whether another page is available and whether a page request is already in progress, reducing duplicate fetches during rapid scrolling.
+    Changes to search text, genre, platform, or sorting preferences create a new query. Infinite scrolling starts from the first page of the updated result set rather than mixing previously loaded pages with new results.
 
-- **Pagination-aware loading and error states**
-  Initial loading and subsequent page loading are handled separately. Skeleton components provide feedback while the first batch of games loads, while additional pages can display a smaller loading indicator without removing existing game cards. Errors can be handled independently for initial requests and subsequent page requests.
+- **Pagination-aware loading and error handling**
 
-- **Serverless API layer**
-  Vercel serverless functions act as a lightweight backend between the React application and RAWG. This keeps the API credential server-side while allowing the frontend to remain a static React application.
+    Initial loading and subsequent page loading are handled separately. Skeleton components provide feedback while the first batch of games loads, while additional pages display a loading indicator without removing existing game cards.
 
 - **Component reuse**
-  UI responsibilities are divided across focused components such as game cards, platform selectors, genre lists, search inputs, sorting controls, loading skeletons, and platform indicators.
+
+    UI responsibilities are divided across focused, reusable components, including game cards, platform selectors, genre lists, search inputs, sorting controls, loading skeletons, platform indicators, and game detail components.
 
 - **Responsive layout**
-  Chakra UI responsive properties are used to adapt the application layout and game grid to different viewport sizes without maintaining separate desktop and mobile implementations.
+
+    Chakra UI responsive properties adapt the application layout and game grid to different viewport sizes without maintaining separate desktop and mobile implementations.
 
 - **Image processing**
-  RAWG image URLs are transformed through a shared utility to request appropriately cropped images. A local placeholder is used when an image is unavailable.
 
-- **Request cancellation**
-  `AbortController` supports cancellation of in-flight requests when the associated operation is no longer needed. Request cancellation is coordinated with the data-fetching approach to avoid unnecessary network activity and stale results.
+    RAWG image URLs are transformed through a shared image utility to request appropriately cropped images. A local placeholder image is used when an API image is unavailable.
+
+- **Static initial data**
+
+    Local genre and platform datasets provide initial query data through React Query's `initialData` option. This allows these resources to be available immediately while their API queries are refreshed.
+
+- **Expandable game descriptions**
+
+    Game descriptions are initially displayed in a shortened format, with the option to expand or collapse the full description when additional information is needed.
 
 - **TypeScript data models**
-  API responses, game query parameters, and component data are represented using TypeScript interfaces and generic types, providing type safety as data moves through the application.
+
+    API responses, game entities, genres, platforms, screenshots, trailers, and query parameters are represented through TypeScript interfaces and generic types, providing type safety throughout the application.
 
 ---
 
 ## 🧱 Tech Stack
 
-- **React 19**
-- **TypeScript**
-- **Vite**
-- **TanStack React Query** — Server-state management, caching, pagination, and infinite scrolling
-- **Zustand** — Global client-side state management
-- **Chakra UI**
-- **Axios**
-- **React Icons**
-- **next-themes**
-- **Vercel Serverless Functions**
-- **RAWG Video Games Database API**
-- **ESLint**
+- **React 19** – Frontend component architecture
+- **TypeScript** – Static typing and application data models
+- **Vite** – Development server and production build tooling
+- **TanStack React Query** – Server-state management, caching, and infinite queries
+- **Zustand** – Global client-side state management
+- **Chakra UI 3** – Responsive component system and UI styling
+- **Axios** – HTTP requests and API communication
+- **React Router** – Client-side routing and game detail navigation
+- **React Icons** – Gaming platform and interface icons
+- **react-infinite-scroll-component** – Infinite scrolling
+- **next-themes** – Light and dark colour mode support
+- **Vercel Serverless Functions** – Backend API layer and secure environment variables
+- **RAWG Video Games Database API** – Game information and metadata
+- **ESLint** – Code quality and linting
 
-Chakra UI is used for the application's responsive component system and layout primitives. React Query manages server state, caching, and paginated data fetching, while Zustand maintains shared client-side query preferences. API communication is implemented using Axios and dedicated hooks, with Vercel serverless functions handling requests to RAWG. The project leverages TypeScript throughout to ensure type safety and maintainability across components, hooks, and API interactions.
+Chakra UI provides the application's responsive component system and layout primitives. TanStack React Query manages server state, caching, and paginated data fetching, while Zustand maintains shared client-side query preferences.
+
+API communication is implemented through Axios and a reusable generic API client. Vercel serverless functions provide a backend layer between the React application and RAWG, keeping API credentials server-side.
+
+React Router manages navigation between the main discovery page and individual game detail pages. TypeScript is used throughout the application to improve type safety and maintainability.
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-api
-├── games.ts              # Vercel function for RAWG game requests
-└── platforms.ts          # Vercel function for RAWG platform requests
-
-src
-├── assets/
-│   ├── emojis/           # Rating indicator images
-│   ├── logo.webp
-│   └── no-image-placeholder.webp
+Final-Project/
 │
-├── components/
-│   ├── Emoji.tsx
-│   ├── GameCard.tsx
-│   ├── GameCardContainer.tsx
-│   ├── GameCardSkeleton.tsx
-│   ├── GameGrid.tsx
-│   ├── GameHeading.tsx
-│   ├── GenreList.tsx
-│   ├── GenreListSkeleton.tsx
-│   ├── MetaCritic.tsx
-│   ├── NavBar.tsx
-│   ├── PlatformIconList.tsx
-│   ├── PlatformSelector.tsx
-│   ├── SearchInput.tsx
-│   ├── SortSelector.tsx
+├── api/
+│   └── rawg.ts                  # Consolidated RAWG serverless function
+│
+├── src/
+│   ├── assets/
+│   │   ├── emojis/              # Game rating indicator images
+│   │   ├── logo.webp
+│   │   └── no-image-placeholder.webp
 │   │
-│   ├── services/
-│   │   ├── api-client.ts
-│   │   └── image-url.ts
+│   ├── components/
+│   │   ├── DefinitionItem.tsx
+│   │   ├── Emoji.tsx
+│   │   ├── ExpandableText.tsx
+│   │   ├── GameAttributes.tsx
+│   │   ├── GameCard.tsx
+│   │   ├── GameCardContainer.tsx
+│   │   ├── GameCardSkeleton.tsx
+│   │   ├── GameGrid.tsx
+│   │   ├── GameHeading.tsx
+│   │   ├── GameScreenshots.tsx
+│   │   ├── GameTrailer.tsx
+│   │   ├── GenreList.tsx
+│   │   ├── GenreListSkeleton.tsx
+│   │   ├── MetaCritic.tsx
+│   │   ├── NavBar.tsx
+│   │   ├── PlatformIconList.tsx
+│   │   ├── PlatformSelector.tsx
+│   │   ├── SearchInput.tsx
+│   │   ├── SortSelector.tsx
+│   │   │
+│   │   ├── services/
+│   │   │   ├── api-client.ts    # Generic Axios API client
+│   │   │   └── image-url.ts     # Image URL processing utility
+│   │   │
+│   │   └── ui/
+│   │       ├── color-mode.tsx
+│   │       ├── provider.tsx
+│   │       ├── toaster.tsx
+│   │       └── tooltip.tsx
 │   │
-│   └── ui/
-│       ├── color-mode.tsx
-│       ├── provider.tsx
-│       ├── toaster.tsx
-│       └── tooltip.tsx
-│
-├── data/
-│   └── genres.ts         # Centralized genre data
-│
-├── hooks/
-│   ├── useData.ts        # Generic API data hook
-│   ├── useGames.ts       # Game API hook
-│   ├── useGenres.ts      # Genre data hook
-│   └── usePlatforms.ts   # Platform API hook
-│
-├── App.tsx
-├── index.css
-├── main.tsx
-└── store.ts
+│   ├── data/
+│   │   ├── genres.ts            # Initial genre dataset
+│   │   └── platforms.ts         # Initial platform dataset
+│   │
+│   ├── entities/
+│   │   ├── Game.ts
+│   │   ├── Genre.ts
+│   │   ├── Platform.ts
+│   │   ├── Publisher.ts
+│   │   ├── Screenshot.ts
+│   │   └── Trailer.ts
+│   │
+│   ├── hooks/
+│   │   ├── useGame.ts           # Individual game query
+│   │   ├── useGames.ts          # Infinite game query
+│   │   ├── useGenre.ts          # Selected genre lookup
+│   │   ├── useGenres.ts         # Genre query
+│   │   ├── usePlatform.ts       # Selected platform lookup
+│   │   ├── usePlatforms.ts      # Platform query
+│   │   ├── useScreenshots.ts    # Game screenshots query
+│   │   └── useTrailers.ts       # Game trailers query
+│   │
+│   ├── pages/
+│   │   ├── ErrorPage.tsx
+│   │   ├── GameDetailPage.tsx
+│   │   ├── HomePage.tsx
+│   │   └── Layout.tsx
+│   │
+│   ├── index.css
+│   ├── main.tsx
+│   ├── routes.tsx
+│   └── store.ts                 # Zustand game query store
+├── index.html
+├── package.json
+├── package-lock.json
+├── tsconfig.json
+├── vercel.json                 # API URL rewrite configuration
+└── vite.config.ts
 ```
 
-Components are separated by responsibility, while API communication and data-fetching logic are kept within dedicated services and hooks. The `/api` directory contains the serverless functions responsible for communicating with RAWG.
+Components are separated by responsibility, while API communication, data models, and data-fetching logic are maintained in dedicated services, entities, and hooks.
+
+The `/api` directory contains the serverless backend responsible for communicating with RAWG. The `/src/data` directory contains local initial datasets, while `/src/entities` defines the application's TypeScript data models.
 
 ---
 
 ## 🚧 Project Status
 
-This project represents a complete, deployed video game discovery application.
+This project represents a completed and deployed video game discovery application.
 
-Potential future enhancements could include:
+The core functionality includes game discovery, search, filtering, sorting, infinite scrolling, individual game details, screenshots, trailers, and a server-side API integration.
 
-- Dedicated game detail pages
-- Game screenshots and trailers
+Potential future enhancements include:
+
 - Favourite games or a personal game library
+- Persistent user preferences
 - Improved accessibility
 - Automated unit and integration testing
-- Persistent user preferences
-- Expanded game metadata and details
+- Additional game metadata and discovery filters
+- Further performance optimization and code splitting
+- API rate limiting and response caching
 
 ---
 
 ## 🚀 Getting Started
 
+### Prerequisites
+
+- Node.js
+- npm
+- A RAWG API key
+- A Vercel account for environment variables and serverless function deployment
+
 ### Installation
 
+Clone the repository and install dependencies:
+
 ```bash
+git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+
+cd Final-Project
+
 npm install
 ```
 
 ### Environment Variables
 
-The application requires a RAWG API key for the Vercel serverless functions.
+The application requires a RAWG API key for its Vercel serverless function.
 
-Create a local environment file containing:
+Create a local `.env.local` file in the project root:
 
 ```env
 RAWG_API_KEY=your_api_key_here
 ```
 
-For production deployments, configure `RAWG_API_KEY` through the Vercel project environment variables.
+For production deployments, configure the same `RAWG_API_KEY` variable through:
 
-**Do not commit API keys or other credentials to the repository.**
+**Vercel Dashboard → Project Settings → Environment Variables**
 
-### Development
+Do not use a `VITE_` prefix. The API key must remain server-side and must never be exposed through frontend environment variables.
+
+The `.env.local` file is excluded from Git through `.gitignore` and should never be committed to the repository.
+
+### Local Development
+
+Link the local project to your Vercel project:
 
 ```bash
-npm run dev
+vercel link
 ```
 
-For local development of the Vercel serverless functions, use the Vercel development environment so the `/api` routes and environment variables are available.
+Pull the configured development environment variables:
+
+```bash
+vercel env pull .env.local --environment=development
+```
+
+Start the local development environment:
+
+```bash
+vercel dev
+```
+
+This starts the Vite frontend together with the Vercel serverless functions, allowing the application's `/api/rawg/*` requests to work locally.
+
+**Note:** `npm run dev` starts the Vite frontend only. Use `vercel dev` when testing the complete application with its serverless API routes.
 
 ### Production Build
 
@@ -248,7 +399,7 @@ For local development of the Vercel serverless functions, use the Vercel develop
 npm run build
 ```
 
-### Preview
+### Preview Production Build
 
 ```bash
 npm run preview
@@ -259,3 +410,23 @@ npm run preview
 ```bash
 npm run lint
 ```
+
+### Deployment
+
+The project is configured for deployment through Vercel.
+
+Connect the GitHub repository to your Vercel project. Subsequent pushes to the configured deployment branch trigger automatic deployments.
+
+Ensure `RAWG_API_KEY` is configured for the Production environment before deploying.
+
+---
+
+## 🔐 Security
+
+The RAWG API key is kept server-side through Vercel environment variables.
+
+The frontend communicates with the application's serverless endpoint rather than directly with RAWG. The serverless function retrieves the private key, validates incoming endpoint paths and query parameters, and forwards approved requests to RAWG.
+
+Environment files and local Vercel configuration are excluded from Git through `.gitignore`.
+
+Never commit API keys, authentication tokens, or other credentials to the repository.
