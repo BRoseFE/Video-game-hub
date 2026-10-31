@@ -19,7 +19,7 @@ function MetaCritic({ criticScore }: Props) {
 		<Badge
 			borderRadius="4px"
 			fontSize="14px"
-			paddingX={2}
+			paddingX={3}
 			colorPalette={scoreColour}
 			size={"sm"}
 		>

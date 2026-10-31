@@ -1,8 +1,8 @@
 import APIClient from "@/components/services/api-client";
 import { useQuery } from "@tanstack/react-query";
-import type { Game } from "../entities/Game";
+import type { Game } from "@/entities/Game";
 
-const apiClient = new APIClient<Game>("/games"); // Avoid relying on an interface in another hook (change at later date)
+const apiClient = new APIClient<Game>("/games");
 
 const useGame = (slug: string) =>
 	useQuery({
