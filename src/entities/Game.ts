@@ -1,6 +1,7 @@
 import type { Platform } from "@/entities/Platform";
 import type { Genre } from "@/entities/Genre";
 import type { Publisher } from "./Publisher";
+import type { Trailer } from "./Trailer";
 
 export interface Game {
 	id: number;
@@ -9,6 +10,7 @@ export interface Game {
 	name: string;
 	genres: Genre[];
 	publishers: Publisher[];
+	trailer: Trailer[];
 	background_image: string;
 	parent_platforms: { platform: Platform }[];
 	metacritic: number;
