@@ -1,6 +1,7 @@
 import NavBar from "@/components/NavBar";
 import { Box, Heading, Text } from "@chakra-ui/react";
 import { isRouteErrorResponse, useRouteError } from "react-router-dom";
+import { getErrorMessage } from "@/utils/getErrorMessage";
 
 const ErrorPage = () => {
 	const error = useRouteError();
@@ -8,8 +9,7 @@ const ErrorPage = () => {
 	let errorMessage: string;
 
 	if (isRouteErrorResponse(error)) {
-		errorMessage =
-			error.data?.toString() || error.statusText || "An error occurred.";
+		errorMessage = getErrorMessage(error.status);
 	} else if (error instanceof Error) {
 		errorMessage = error.message;
 	} else {
@@ -19,8 +19,8 @@ const ErrorPage = () => {
 	return (
 		<>
 			<NavBar />
-			<Box justifyItems="center" padding={5}>
-				<Heading>Oops...</Heading>
+			<Box textAlign="center" padding={5}>
+				<Heading mb={3}>Oops...</Heading>
 				<Text>{errorMessage}</Text>
 			</Box>
 		</>
