@@ -5,7 +5,6 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
 import router from "@/routes";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 export const queryClient = new QueryClient();
 
@@ -15,7 +14,6 @@ createRoot(document.getElementById("root")!).render(
 		<Provider>
 			<QueryClientProvider client={queryClient}>
 				<RouterProvider router={router} />
-				<ReactQueryDevtools />
 			</QueryClientProvider>
 		</Provider>
 	</StrictMode>,

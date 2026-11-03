@@ -22,6 +22,11 @@ const ErrorPage = () => {
 			<Box textAlign="center" padding={5}>
 				<Heading mb={3}>Oops...</Heading>
 				<Text>{errorMessage}</Text>
+				<Text>
+					{" "}
+					Unfortunately, rawg.io website is down and in this case, the
+					API is also not working
+				</Text>
 			</Box>
 		</>
 	);
