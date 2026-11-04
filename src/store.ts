@@ -1,29 +1,29 @@
 import { create } from "zustand";
+import type { GameBrainActiveFilter } from "@/entities/GameBrainFilters";
+import type { GameBrainSorting } from "@/entities/GameBrainFilters";
 
 interface GameQuery {
-	genreId?: number;
-	platformId?: number;
-	sortOrder?: string;
 	searchText?: string;
+	activeFilters?: GameBrainActiveFilter[];
+	sorting?: GameBrainSorting;
 }
 
 interface GameQueryStore {
 	gameQuery: GameQuery;
 	setSearchText: (searchText: string) => void;
-	setGenreId: (genreId: number | undefined) => void;
-	setPlatformId: (platformId: number | undefined) => void;
-	setSortOrder: (sortOrder: string) => void;
+	setActiveFilters: (activeFilters: GameBrainActiveFilter[]) => void;
+	setSorting: (sorting: GameBrainSorting) => void;
 }
 
 const useGameQueryStore = create<GameQueryStore>((set) => ({
 	gameQuery: {},
 	setSearchText: (searchText) => set(() => ({ gameQuery: { searchText } })),
-	setGenreId: (genreId) =>
-		set((store) => ({ gameQuery: { ...store.gameQuery, genreId } })),
-	setPlatformId: (platformId) =>
-		set((store) => ({ gameQuery: { ...store.gameQuery, platformId } })),
-	setSortOrder: (sortOrder) =>
-		set((store) => ({ gameQuery: { ...store.gameQuery, sortOrder } })),
+	setActiveFilters: (activeFilters) =>
+		set((store) => ({ gameQuery: { ...store.gameQuery, activeFilters } })),
+	setSorting: (sorting) =>
+		set((store) => ({
+			gameQuery: { ...store.gameQuery, sorting },
+		})),
 }));
 
 export default useGameQueryStore;

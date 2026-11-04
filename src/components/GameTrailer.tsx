@@ -1,17 +1,17 @@
-import useTrailers from "@/hooks/useTrailers";
+import useGame from "@/hooks/useGame";
 
 interface Props {
 	gameId: number;
 }
 
 function GameTrailer({ gameId }: Props) {
-	const { data, error, isLoading } = useTrailers(gameId);
+	const { data: game, error, isLoading } = useGame(String(gameId));
 
 	if (isLoading) return null;
 
 	if (error) throw error;
 
-	const first = data?.results[0];
+	const first = game?.trailer[0];
 
 	return first ? (
 		<video src={first.data[480]} poster={first.preview} controls />

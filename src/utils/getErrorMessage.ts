@@ -7,6 +7,9 @@ export const getErrorMessage = (status: number): string => {
 		case 401:
 			return "Authentication failed. The API service could not authorize this request.";
 
+		case 402:
+			return "API key is limited to 50 calls per day. Limit has been reached";
+
 		case 403:
 			return "Access denied. You don't have permission to access this resource.";
 

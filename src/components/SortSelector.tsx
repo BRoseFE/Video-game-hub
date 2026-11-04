@@ -2,24 +2,21 @@ import useGameQueryStore from "@/store";
 import { Button, HStack, Menu, Portal } from "@chakra-ui/react";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
+import type { GameBrainSortingOption } from "@/entities/GameBrainFilters";
 
-function SortSelector() {
+interface Props {
+	sortingOptions: GameBrainSortingOption[];
+}
+
+function SortSelector({ sortingOptions }: Props) {
 	const [open, setOpen] = useState(false);
 
-	const sortOrders = [
-		{ value: "", label: "Relevance" },
-		{ value: "-added", label: "Date added" },
-		{ value: "name", label: "Name" },
-		{ value: "-released", label: "Release date" },
-		{ value: "-metacritic", label: "Popularity" },
-		{ value: "-rating", label: "Average rating" },
-	];
+	const sorting = useGameQueryStore((s) => s.gameQuery.sorting);
+	const setSorting = useGameQueryStore((s) => s.setSorting);
 
-	const sortOrder = useGameQueryStore((s) => s.gameQuery.sortOrder);
-	const selectedSortOrder = useGameQueryStore((s) => s.setSortOrder);
-
-	const currentSortOrder = sortOrders.find(
-		(order) => order.value === sortOrder,
+	const currentSort = sortingOptions.find(
+		(option) =>
+			option.key === sorting?.key && option.sort === sorting?.direction,
 	);
 
 	return (
@@ -27,7 +24,7 @@ function SortSelector() {
 			<Menu.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
 				<Menu.Trigger asChild>
 					<Button variant="subtle" size="lg">
-						Order By: {currentSortOrder?.label || "Relevance"}
+						Order By: {currentSort?.name ?? "Relevance"}
 						<FaAngleDown />
 					</Button>
 				</Menu.Trigger>
@@ -35,15 +32,30 @@ function SortSelector() {
 				<Portal>
 					<Menu.Positioner>
 						<Menu.Content>
-							{sortOrders.map((order) => (
+							<Menu.Item
+								value="relevance"
+								onClick={() =>
+									setSorting({
+										key: null,
+										direction: null,
+									})
+								}
+							>
+								Relevance
+							</Menu.Item>
+
+							{sortingOptions.map((option) => (
 								<Menu.Item
-									key={order.value}
-									value={order.value}
+									key={option.key}
+									value={option.key}
 									onClick={() =>
-										selectedSortOrder(order.value)
+										setSorting({
+											key: option.key,
+											direction: option.sort,
+										})
 									}
 								>
-									{order.label}
+									{option.name}
 								</Menu.Item>
 							))}
 						</Menu.Content>

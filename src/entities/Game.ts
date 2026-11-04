@@ -11,10 +11,12 @@ export default interface Game {
 	name: string;
 	genres: Genre[];
 	publishers: Publisher[];
+	developer: string | null;
 	trailer: Trailer[];
 	screenshot: Screenshot[];
 	background_image: string;
 	parent_platforms: { platform: Platform }[];
-	metacritic: number;
+	metacritic: number | null;
 	rating_top: number;
+	gamebrainScore: number | null;
 }

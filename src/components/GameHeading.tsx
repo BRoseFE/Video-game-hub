@@ -1,17 +1,20 @@
-import useGenre from "@/hooks/useGenre";
-import usePlatform from "@/hooks/usePlatform";
 import useGameQueryStore from "@/store";
-
 import { Heading } from "@chakra-ui/react";
 
+const EMPTY_FILTERS: never[] = [];
+
 function GameHeading() {
-	const genreId = useGameQueryStore((s) => s.gameQuery.genreId);
-	const genre = useGenre(genreId);
+	const searchText = useGameQueryStore((s) => s.gameQuery.searchText);
 
-	const platformId = useGameQueryStore((s) => s.gameQuery.platformId);
-	const platform = usePlatform(platformId);
+	const storedFilters = useGameQueryStore((s) => s.gameQuery.activeFilters);
 
-	const heading = `${platform?.name || ""} ${genre?.name || ""} Games`;
+	const activeFilters = storedFilters ?? EMPTY_FILTERS;
+
+	const heading = searchText
+		? `${searchText} Games`
+		: activeFilters.length > 0
+			? "Filtered Games"
+			: "Games";
 
 	return (
 		<Heading as="h1" fontSize="5xl" marginY={5}>

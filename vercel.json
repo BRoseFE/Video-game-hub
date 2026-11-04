@@ -2,8 +2,8 @@
 	"$schema": "https://openapi.vercel.sh/vercel.json",
 	"rewrites": [
 		{
-			"source": "/api/rawg/(.*)",
-			"destination": "/api/rawg?path=$1"
+			"source": "/api/gamebrain/(.*)",
+			"destination": "/api/gamebrain?path=$1"
 		}
 	]
 }

@@ -1,15 +1,17 @@
 import { Badge } from "@chakra-ui/react";
 
 interface Props {
-	criticScore: number;
+	criticScore: number | null;
 }
 
-function MetaCritic({ criticScore }: Props) {
+function CriticScore({ criticScore }: Props) {
+	if (criticScore === null) return null;
+
 	let scoreColour: "green" | "yellow" | "red";
 
-	if (criticScore >= 75) {
+	if (criticScore ?? 0 >= 75) {
 		scoreColour = "green";
-	} else if (criticScore >= 60) {
+	} else if (criticScore ?? 0 >= 60) {
 		scoreColour = "yellow";
 	} else {
 		scoreColour = "red";
@@ -28,4 +30,4 @@ function MetaCritic({ criticScore }: Props) {
 	);
 }
 
-export default MetaCritic;
+export default CriticScore;
